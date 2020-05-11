@@ -11,6 +11,8 @@ public class FripperController : MonoBehaviour {
     //左右のフリッパーがコントロール中か
     private bool isLeftTouchControll = false;
     private bool isRightTouchControll = false;
+    private int leftTouchID = -1;
+    private int rightTouchID = -1;
 
     private float windowMiddlePosition = 0f;//ウィンドウ横幅の中央位置
 
@@ -34,37 +36,38 @@ public class FripperController : MonoBehaviour {
             {
                 if (Input.touches[i].position.x < windowMiddlePosition)
                 {
-                    if (!isLeftTouchControll && tag == "LeftFripperTag")
+                    if (leftTouchID < 0 && tag == "LeftFripperTag")
                     {
-                        isLeftTouchControll = true;
+                        leftTouchID = Input.touches[i].fingerId;
                         SetAngle(this.flickAngle);
                     }
                 }
                 else
                 {
-                    if (!isRightTouchControll && tag == "RightFripperTag")
+                    if (rightTouchID < 0 && tag == "RightFripperTag")
                     {
-                        isRightTouchControll = true;
+                        rightTouchID = Input.touches[i].fingerId;
                         SetAngle(this.flickAngle);
                     }
                 }
             }
             else if (Input.touches[i].phase == TouchPhase.Ended)
             {
-                if (isLeftTouchControll && tag == "LeftFripperTag")
+                if (leftTouchID > -1 && tag == "LeftFripperTag" && leftTouchID == Input.touches[i].fingerId)
                 {
-                    isLeftTouchControll = false;
+                    leftTouchID = -1;
                     SetAngle(this.defaultAngle);
                 }
-                else if (isRightTouchControll && tag == "RightFripperTag")
+
+                if (rightTouchID > -1 && tag == "RightFripperTag" && rightTouchID == Input.touches[i].fingerId)
                 {
-                    isRightTouchControll = false;
+                    rightTouchID = -1;
                     SetAngle(this.defaultAngle);
                 }
             }
         }
         //タッチ入力が無い時はPC側の判定をする
-        if (!isLeftTouchControll)
+        if (leftTouchID < 0)
         {
             if (Input.GetKeyDown(KeyCode.LeftArrow) && tag == "LeftFripperTag")
             {
@@ -76,7 +79,7 @@ public class FripperController : MonoBehaviour {
             }
         }
 
-        if (!isRightTouchControll)
+        if (rightTouchID < 0)
         {
             if (Input.GetKeyDown(KeyCode.RightArrow) && tag == "RightFripperTag")
             {
